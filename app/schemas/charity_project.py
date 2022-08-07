@@ -12,7 +12,6 @@ class CharityProjectCreate(BaseModel):
 
     @root_validator()
     def at_least_fields_query_not_empty_and_null(cls, values):
-        print(values)
         for field in values:
             if values[field] in [None, '']:
                 raise ValueError(
