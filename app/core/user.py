@@ -1,6 +1,6 @@
-from typing import Union
+from typing import Optional, Union
 
-from fastapi import Depends
+from fastapi import Depends, Request
 from fastapi_users import (BaseUserManager, FastAPIUsers, IntegerIDMixin,
                            InvalidPasswordException)
 from fastapi_users.authentication import (AuthenticationBackend,
@@ -12,6 +12,7 @@ from app.core.config import settings
 from app.core.db import get_async_session
 from app.models.user import User
 from app.schemas.user import UserCreate
+import logging
 
 
 async def get_user_db(session: AsyncSession = Depends(get_async_session)):
@@ -46,6 +47,11 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             raise InvalidPasswordException(
                 reason='Password should not contain e-mail'
             )
+
+    async def on_after_register(
+            self, user: User, request: Optional[Request] = None
+    ):
+        logging.info(f'Пользователь {user.email} был зарегистрирован')
 
 
 async def get_user_manager(user_db=Depends(get_user_db)):
